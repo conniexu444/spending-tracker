@@ -6,7 +6,6 @@ export type Subcategory = {
   
   export interface Category {
     title: string;
-    description: string;
     subcategories: Subcategory[];
   }
   
@@ -15,7 +14,6 @@ export type Subcategory = {
   export const defaultCategories: Category[] = [
     {
       title: "Housing",
-      description: "Expenses related to housing and rent.",
       subcategories: [
         { label: "Rent", value: "" },
         { label: "Wifi", value: "" },
@@ -25,7 +23,6 @@ export type Subcategory = {
     },
     {
       title: "Food",
-      description: "Expenses for groceries and dining out.",
       subcategories: [
         { label: "Restaurants", value: "" },
         { label: "Groceries", value: "" },
@@ -33,17 +30,14 @@ export type Subcategory = {
     },
     {
       title: "Loans",
-      description: "Loan repayments and debts.",
       subcategories: [],
     },
     {
       title: "Subscriptions",
-      description: "Recurring subscription services.",
       subcategories: [],
     },
     {
       title: "Transportation",
-      description: "Transportation and commuting costs.",
       subcategories: [
         { label: "Gas", value: "" },
       ],

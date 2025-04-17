@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { MainMenusGradientCard } from "./gradient-card";
 import { ModernSimpleInput } from "./ModernSimpleInput";
 import { BeforeEffectButton } from "./BeforeEffectButton";
+import { ShinyRotatingBorderButton } from "./shiny-button";
 
 interface CategoryCardProps {
   category: Category;
@@ -34,11 +35,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
 
   return (
     <>
-      <MainMenusGradientCard
-        title={category.title}
-        description={category.description}
-        className="h-auto"
-      >
+      <MainMenusGradientCard title={category.title} className="h-auto">
         <div className="space-y-3">
           {category.subcategories.map((sub, subIndex) => (
             <div key={subIndex} className="flex gap-2 items-center">
@@ -66,12 +63,9 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
               </BeforeEffectButton>
             </div>
           ))}
-          <button
-            onClick={() => onAddSubcategory(index)}
-            className="mt-2 text-sm text-blue-600 hover:underline"
-          >
+          <ShinyRotatingBorderButton onClick={() => onAddSubcategory(index)}>
             + Add Subcategory
-          </button>
+          </ShinyRotatingBorderButton>
         </div>
       </MainMenusGradientCard>
 

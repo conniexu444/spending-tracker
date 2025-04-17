@@ -43,10 +43,9 @@ export function useCategories() {
     setCategories(updated);
   };
 
-  const addCategory = (title: string, description: string = "") => {
+  const addCategory = (title: string) => {
     const newCategory = {
       title: title.trim(),
-      description: description.trim(),
       subcategories: [],
     };
   

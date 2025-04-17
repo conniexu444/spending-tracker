@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { cn } from "./utils/cn";
-import PreviewPillSwitchTheme from "./components/PreviewPillSwitchTheme";
+import PreviewPillSwitchTheme from "./components/toggle-theme-icon";
 import BudgetAppHeaderCard from "./components/BudgetAppHeaderCard";
 import { ModernSimpleInput } from "./components/ModernSimpleInput";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut, Pie } from "react-chartjs-2";
-import { MainMenusGradientCard } from "./components/gradient-card";
 import { useTheme } from "./hooks/useTheme";
 import { useCategories } from "./hooks/useCategories";
 import { useCurrency } from "./hooks/useCurrency";
 import CategoryCard from "./components/category-card";
 import MonthlyIncomeCard from "./components/monthly-income-card";
+import { ShinyRotatingBorderButton } from "./components/shiny-button";
+import { MainMenusCompactCard } from "./components/gradient-card-compact";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -19,7 +20,6 @@ const App = () => {
   const [income, setIncome] = useState<string>("");
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategoryDescription, setNewCategoryDescription] = useState("");
   const { format, parseCurrency } = useCurrency();
 
   const {
@@ -34,10 +34,9 @@ const App = () => {
 
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;
-    addCategory(newCategoryName, newCategoryDescription);
+    addCategory(newCategoryName);
     setShowAddCategoryModal(false);
     setNewCategoryName("");
-    setNewCategoryDescription("");
   };
 
   const formatCurrency = (value: string) => {
@@ -56,7 +55,7 @@ const App = () => {
   );
 
   const totalSpent = categoryTotals.reduce((a, b) => a + b, 0);
-  const incomeAmount = parseCurrency(income); 
+  const incomeAmount = parseCurrency(income);
   const remaining = Math.max(0, incomeAmount - totalSpent);
 
   return (
@@ -73,10 +72,9 @@ const App = () => {
       </div>
 
       <div className="w-full max-w-screen-2xl mx-auto flex flex-col gap-6">
-        <BudgetAppHeaderCard />
-
         <div className="flex flex-col lg:flex-row gap-10 w-full">
-          <div className="w-full max-w-4xl flex flex-col gap-6">
+          <div className="w-full lg:w-3/5 flex flex-col gap-6">
+            <BudgetAppHeaderCard />
             <MonthlyIncomeCard
               income={income}
               setIncome={setIncome}
@@ -97,41 +95,58 @@ const App = () => {
               />
             ))}
 
-            <button
+            <ShinyRotatingBorderButton
               onClick={() => setShowAddCategoryModal(true)}
-              className="text-blue-600 hover:underline text-sm mt-2 self-start"
             >
               + Add New Category
-            </button>
+            </ShinyRotatingBorderButton>
           </div>
 
           <div className="flex flex-col items-center gap-8 w-full max-w-md">
             <div className="w-full">
               <div className="w-full flex flex-col sm:flex-row items-stretch gap-4 mb-4">
-                <MainMenusGradientCard
-                  title="Total Spent"
-                  className="flex-1 px-4 py-2"
-                  withArrow={false}
-                >
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white px-2">
-                    {format(totalSpent.toString())}
-                  </p>
-                </MainMenusGradientCard>
+                <div className="flex-1">
+                  <MainMenusCompactCard
+                    className="flex-1"
+                    header={
+                      <div className="flex justify-between items-center px-2 py-1">
+                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                          Total Spent
+                        </span>
+                        <span className="text-base font-semibold text-gray-900 dark:text-white">
+                          {format(totalSpent.toString())}
+                        </span>
+                      </div>
+                    }
+                  />
+                </div>
 
-                <MainMenusGradientCard
-                  title="Total Left"
-                  className="flex-1 px-4 py-2"
-                  withArrow={false}
-                >
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white px-2">
-                    {format(remaining.toString())}
-                  </p>
-                </MainMenusGradientCard>
+                <div className="flex-1">
+                  <MainMenusCompactCard
+                    className="flex-1"
+                    header={
+                      <div className="flex justify-between items-center px-2 py-1">
+                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                          Total Left
+                        </span>
+                        <span className="text-base font-semibold text-gray-900 dark:text-white">
+                          {format(remaining.toString())}
+                        </span>
+                      </div>
+                    }
+                  />
+                </div>
               </div>
 
-              <h2 className="text-center font-semibold mb-2">
-                Spending Breakdown
-              </h2>
+              <MainMenusCompactCard
+                className="w-full"
+                header={
+                  <div className="text-sm font-medium text-center text-neutral-700 dark:text-neutral-300 py-1">
+                    Spending Breakdown
+                  </div>
+                }
+              />
+
               <Pie
                 data={{
                   labels: categories.map((cat) => cat.title),
@@ -154,9 +169,15 @@ const App = () => {
             </div>
 
             <div className="w-full">
-              <h2 className="text-center font-semibold mb-2">
-                Remaining Budget
-              </h2>
+              <MainMenusCompactCard
+                className="w-full"
+                header={
+                  <div className="text-sm font-medium text-center text-neutral-700 dark:text-neutral-300 py-1">
+                    Remaining Budget
+                  </div>
+                }
+              />
+
               <Doughnut
                 data={{
                   labels: ["Spent", "Remaining"],
@@ -196,19 +217,6 @@ const App = () => {
                   placeholder="e.g. Entertainment"
                 />
               </div>
-
-              <div>
-                <label className="text-sm font-medium block mb-1 dark:text-neutral-300">
-                  Description (optional)
-                </label>
-                <ModernSimpleInput
-                  type="text"
-                  value={newCategoryDescription}
-                  onChange={(e) => setNewCategoryDescription(e.target.value)}
-                  placeholder="e.g. Concerts, movies, hobbies"
-                />
-              </div>
-
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   onClick={() => setShowAddCategoryModal(false)}

@@ -1,8 +1,6 @@
-"use client";
-
 import React from "react";
 import { ModernSimpleInput } from "./ModernSimpleInput";
-import { MainMenusGradientCard } from "./gradient-card";
+import { MainMenusCompactCard } from "./gradient-card-compact";
 
 interface MonthlyIncomeCardProps {
   income: string;
@@ -18,28 +16,27 @@ const MonthlyIncomeCard: React.FC<MonthlyIncomeCardProps> = ({
   parseCurrency,
 }) => {
   return (
-    <MainMenusGradientCard
-      title="Monthly Income"
+    <MainMenusCompactCard
       className="w-full"
-      withArrow={false}
-    >
-      <div className="flex flex-col gap-2 p-4">
-        <label className="block font-medium text-sm text-neutral-700 dark:text-neutral-200">
-          Monthly Total Income
-        </label>
-        <ModernSimpleInput
-          type="text"
-          value={income}
-          onChange={(e) => setIncome(e.target.value)}
-          onBlur={(e) => {
-            const raw = parseCurrency(e.target.value);
-            setIncome(raw.toString());
-          }}
-          placeholder="$0.00"
-          className="max-w-xs"
-        />
-      </div>
-    </MainMenusGradientCard>
+      header={
+        <div className="flex justify-between items-center px-2 py-1">
+          <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+            Monthly Income
+          </span>
+          <ModernSimpleInput
+            type="text"
+            value={income}
+            onChange={(e) => setIncome(e.target.value)}
+            onBlur={(e) => {
+              const raw = parseCurrency(e.target.value);
+              setIncome(raw.toString());
+            }}
+            placeholder="$0.00"
+            className="w-32 text-right"
+          />
+        </div>
+      }
+    />
   );
 };
 
