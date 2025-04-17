@@ -1,17 +1,24 @@
-import { useState } from "react";
-import { cn } from "./utils/cn";
-import PreviewPillSwitchTheme from "./components/toggle-theme-icon";
-import BudgetAppHeaderCard from "./components/BudgetAppHeaderCard";
-import { ModernSimpleInput } from "./components/ModernSimpleInput";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut, Pie } from "react-chartjs-2";
-import { useTheme } from "./hooks/useTheme";
+import { useState } from "react";
+import RightPane from "./components/right-pane";
+import LeftPane from "./components/left-pane";
+
+import BudgetAppHeaderCard from "./components/BudgetAppHeaderCard";
+import CategoryCard from "./components/category-card";
+import { MainMenusCompactCard } from "./components/gradient-card-compact";
+import MonthlyIncomeCard from "./components/monthly-income-card";
+import { ModernSimpleInput } from "./components/ModernSimpleInput";
+import PreviewPillSwitchTheme from "./components/toggle-theme-icon";
+import { ShinyRotatingBorderButton } from "./components/shiny-button";
+
+import { MainMenusGradientCard } from "./gradient-card";
+
 import { useCategories } from "./hooks/useCategories";
 import { useCurrency } from "./hooks/useCurrency";
-import CategoryCard from "./components/category-card";
-import MonthlyIncomeCard from "./components/monthly-income-card";
-import { ShinyRotatingBorderButton } from "./components/shiny-button";
-import { MainMenusCompactCard } from "./components/gradient-card-compact";
+import { useTheme } from "./hooks/useTheme";
+
+import { cn } from "./utils/cn";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -61,7 +68,7 @@ const App = () => {
   return (
     <div
       className={cn(
-        "min-h-screen transition-colors w-full px-6 sm:px-10 lg:px-24 mt-10",
+        "min-h-screen transition-colors w-full px-6 sm:px-10 lg:px-32 mt-10",
         theme === "dark" ? "bg-zinc-900 text-white" : "bg-white text-gray-900",
       )}
     >
@@ -72,130 +79,31 @@ const App = () => {
       </div>
 
       <div className="w-full max-w-screen-2xl mx-auto flex flex-col gap-6">
+        <BudgetAppHeaderCard />
         <div className="flex flex-col lg:flex-row gap-10 w-full">
-          <div className="w-full lg:w-3/5 flex flex-col gap-6">
-            <BudgetAppHeaderCard />
-            <MonthlyIncomeCard
-              income={income}
-              setIncome={setIncome}
-              format={format}
-              parseCurrency={parseCurrency}
-            />
+          
+          <LeftPane
+            income={income}
+            setIncome={setIncome}
+            format={format}
+            parseCurrency={parseCurrency}
+            categories={categories}
+            handleSubcategoryChange={handleSubcategoryChange}
+            handleSubcategoryLabelChange={handleSubcategoryLabelChange}
+            addSubcategory={addSubcategory}
+            deleteSubcategory={deleteSubcategory}
+            deleteCategory={deleteCategory}
+            setShowAddCategoryModal={setShowAddCategoryModal}
+          />
 
-            {categories.map((cat, index) => (
-              <CategoryCard
-                key={index}
-                category={cat}
-                index={index}
-                onSubcategoryChange={handleSubcategoryChange}
-                onLabelChange={handleSubcategoryLabelChange}
-                onAddSubcategory={addSubcategory}
-                onDeleteSubcategory={deleteSubcategory}
-                onDeleteCategory={deleteCategory}
-              />
-            ))}
-
-            <ShinyRotatingBorderButton
-              onClick={() => setShowAddCategoryModal(true)}
-            >
-              + Add New Category
-            </ShinyRotatingBorderButton>
-          </div>
-
-          <div className="flex flex-col items-center gap-8 w-full max-w-md">
-            <div className="w-full">
-              <div className="w-full flex flex-col sm:flex-row items-stretch gap-4 mb-4">
-                <div className="flex-1">
-                  <MainMenusCompactCard
-                    className="flex-1"
-                    header={
-                      <div className="flex justify-between items-center px-2 py-1">
-                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                          Total Spent
-                        </span>
-                        <span className="text-base font-semibold text-gray-900 dark:text-white">
-                          {format(totalSpent.toString())}
-                        </span>
-                      </div>
-                    }
-                  />
-                </div>
-
-                <div className="flex-1">
-                  <MainMenusCompactCard
-                    className="flex-1"
-                    header={
-                      <div className="flex justify-between items-center px-2 py-1">
-                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                          Total Left
-                        </span>
-                        <span className="text-base font-semibold text-gray-900 dark:text-white">
-                          {format(remaining.toString())}
-                        </span>
-                      </div>
-                    }
-                  />
-                </div>
-              </div>
-
-              <MainMenusCompactCard
-                className="w-full"
-                header={
-                  <div className="text-sm font-medium text-center text-neutral-700 dark:text-neutral-300 py-1">
-                    Spending Breakdown
-                  </div>
-                }
-              />
-
-              <Pie
-                data={{
-                  labels: categories.map((cat) => cat.title),
-                  datasets: [
-                    {
-                      label: "Amount Spent",
-                      data: categoryTotals,
-                      backgroundColor: [
-                        "#f87171",
-                        "#60a5fa",
-                        "#facc15",
-                        "#34d399",
-                        "#a78bfa",
-                      ],
-                      borderWidth: 1,
-                    },
-                  ],
-                }}
-              />
-            </div>
-
-            <div className="w-full">
-              <MainMenusCompactCard
-                className="w-full"
-                header={
-                  <div className="text-sm font-medium text-center text-neutral-700 dark:text-neutral-300 py-1">
-                    Remaining Budget
-                  </div>
-                }
-              />
-
-              <Doughnut
-                data={{
-                  labels: ["Spent", "Remaining"],
-                  datasets: [
-                    {
-                      label: "Budget",
-                      data: [
-                        totalSpent,
-                        Math.max(0, incomeAmount - totalSpent),
-                      ],
-                      backgroundColor: ["#f87171", "#4ade80"],
-                      borderWidth: 1,
-                    },
-                  ],
-                }}
-              />
-            </div>
-          </div>
+          <RightPane
+            format={format}
+            totalSpent={totalSpent}
+            remaining={remaining}
+            incomeAmount={incomeAmount}
+            categories={categories}
+            categoryTotals={categoryTotals}
+          />
         </div>
       </div>
       {showAddCategoryModal && (

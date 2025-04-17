@@ -61,7 +61,6 @@ export const MainMenusGradientCard = ({
           {withArrow && (
             <ArrowUpRightIcon className="size-5 text-neutral-700 dark:text-neutral-300" />
           )}
-          
         </div>
 
         {description && (
@@ -72,13 +71,13 @@ export const MainMenusGradientCard = ({
       </div>
       <div className="absolute inset-px rounded-[19px] bg-neutral-100/80 dark:bg-neutral-900/80" />
       {onDeleteCategory && (
-            <BeforeEffectButton
-              onClick={onDeleteCategory}
-              className="absolute top-3 right-3 text-gray-600 dark:text-white hover:text-red-600"
-            >
-              <X size={14} />
-            </BeforeEffectButton>
-          )}
+        <BeforeEffectButton
+          onClick={onDeleteCategory}
+          className="absolute top-3 right-3 text-gray-600 dark:text-white hover:text-red-600"
+        >
+          <X size={14} />
+        </BeforeEffectButton>
+      )}
       {children && (
         <div
           className={cn(
