@@ -1,8 +1,9 @@
 "use client";
-import { ArrowUpRightIcon } from "lucide-react";
+import { ArrowUpRightIcon, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMouse } from "../cuicui/hooks/use-mouse";
 import { cn } from "../utils/cn";
+import { BeforeEffectButton } from "./BeforeEffectButton";
 
 export const MainMenusGradientCard = ({
   title,
@@ -11,6 +12,7 @@ export const MainMenusGradientCard = ({
   circleSize = 400,
   className,
   children,
+  onDeleteCategory,
   size = "md",
 }: {
   title: string;
@@ -19,6 +21,7 @@ export const MainMenusGradientCard = ({
   circleSize?: number;
   children?: ReactNode;
   className?: string;
+  onDeleteCategory?: () => void;
   size?: "sm" | "md" | "lg";
 }) => {
   const [mouse, parentRef] = useMouse();
@@ -58,6 +61,7 @@ export const MainMenusGradientCard = ({
           {withArrow && (
             <ArrowUpRightIcon className="size-5 text-neutral-700 dark:text-neutral-300" />
           )}
+          
         </div>
 
         {description && (
@@ -67,10 +71,18 @@ export const MainMenusGradientCard = ({
         )}
       </div>
       <div className="absolute inset-px rounded-[19px] bg-neutral-100/80 dark:bg-neutral-900/80" />
+      {onDeleteCategory && (
+            <BeforeEffectButton
+              onClick={onDeleteCategory}
+              className="absolute top-3 right-3 text-gray-600 dark:text-white hover:text-red-600"
+            >
+              <X size={14} />
+            </BeforeEffectButton>
+          )}
       {children && (
         <div
           className={cn(
-            "relative p-4 rounded-[15px] border-white bg-white/70 dark:border-neutral-950 dark:bg-transparent",
+            "relative p-4 rounded-[15px] border-white dark:border-neutral-950 dark:bg-transparent",
             className,
           )}
         >

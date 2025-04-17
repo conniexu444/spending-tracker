@@ -35,7 +35,11 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
 
   return (
     <>
-      <MainMenusGradientCard title={category.title} className="h-auto">
+      <MainMenusGradientCard
+        title={category.title}
+        className="h-auto"
+        onDeleteCategory={() => setShowDeleteConfirm(true)}
+      >
         <div className="space-y-3">
           {category.subcategories.map((sub, subIndex) => (
             <div key={subIndex} className="flex gap-2 items-center">
@@ -47,13 +51,13 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 className="w-1/2"
               />
               <ModernSimpleInput
-                type="text"
+                type="number"
                 value={sub.value}
                 onChange={(e) =>
                   onSubcategoryChange(index, subIndex, e.target.value)
                 }
                 placeholder="$0.00"
-                className="w-1/3"
+                className="w-1/3 no-spinner"
               />
               <BeforeEffectButton
                 onClick={() => onDeleteSubcategory(index, subIndex)}
