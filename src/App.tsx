@@ -1,18 +1,11 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Doughnut, Pie } from "react-chartjs-2";
 import { useState } from "react";
 import RightPane from "./components/right-pane";
 import LeftPane from "./components/left-pane";
 
 import BudgetAppHeaderCard from "./components/BudgetAppHeaderCard";
-import CategoryCard from "./components/category-card";
-import { MainMenusCompactCard } from "./components/gradient-card-compact";
-import MonthlyIncomeCard from "./components/monthly-income-card";
 import { ModernSimpleInput } from "./components/ModernSimpleInput";
 import PreviewPillSwitchTheme from "./components/toggle-theme-icon";
-import { ShinyRotatingBorderButton } from "./components/shiny-button";
-
-import { MainMenusGradientCard } from "./gradient-card";
 
 import { useCategories } from "./hooks/useCategories";
 import { useCurrency } from "./hooks/useCurrency";
