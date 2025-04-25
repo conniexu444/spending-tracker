@@ -1,91 +1,90 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import type { BorderStyle } from "exceljs";
 
-export const exportCategoriesToExcel = (categories: any[]) => {
-  const rows: any[] = [];
+export const exportCategoriesToExcelWithStyle = async (categories: any[]) => {
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet("Budget");
+  const thin: BorderStyle = "thin";
 
-  rows.push(["My Monthly Budget", "", ""]);
-  rows.push(["", "", ""]);
-
-  categories.forEach((cat) => {
-    rows.push([cat.title, "", ""]);
-
-    cat.subcategories.forEach((sub: any) => {
-      rows.push([
-        "",
-        sub.label,
-        parseFloat(sub.value || "0"),
-      ]);
-    });
-
-    rows.push(["", "", ""]);
-  });
-
-  const worksheet = XLSX.utils.aoa_to_sheet(rows);
-
-  worksheet["!merges"] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } },
-  ];
-
-  worksheet["A1"].s = {
-    font: { bold: true, sz: 16 },
-    alignment: { horizontal: "center", vertical: "center" },
+  const borderStyle = {
+    top: { style: thin },
+    bottom: { style: thin },
+    left: { style: thin },
+    right: { style: thin },
   };
 
-  let rowIndex = 3;
+  // Title
+  const titleRow = sheet.addRow(["My Monthly Budget"]);
+  titleRow.font = { bold: true, size: 18 };
+  sheet.mergeCells("A1:B1");
 
-  categories.forEach((cat) => {
-    const headerCell = `A${rowIndex}`;
-    if (worksheet[headerCell]) {
-      worksheet[headerCell].s = {
-        font: { bold: true },
-        fill: { fgColor: { rgb: "D9E1F2" } }, // Light blue
-        alignment: { horizontal: "center" },
-        border: {
-          bottom: { style: "thin", color: { rgb: "000000" } },
-        },
-      };
-    }
+  sheet.addRow([]); // spacer
 
+  let totalSpent = 0;
+
+  categories.forEach((cat: any) => {
+    // Category Header
+    const catRow = sheet.addRow([cat.title]);
+    catRow.font = { bold: true };
+    catRow.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "D0D7FF" },
+    };
+    sheet.mergeCells(`A${catRow.number}:B${catRow.number}`);
+
+    // Apply border to the merged cell
+    catRow.getCell(1).border = borderStyle;
+
+    // Subcategories
     cat.subcategories.forEach((sub: any, idx: number) => {
-      const subRow = rowIndex + idx + 1;
+      const amount = parseFloat(sub.value || "0") || 0;
+      totalSpent += amount;
 
-      if (subRow % 2 === 0) { 
-        const subLabelCell = `B${subRow}`;
-        const amountCell = `C${subRow}`;
+      const row = sheet.addRow([sub.label, amount]);
+      row.getCell(2).numFmt = '"$"#,##0.00';
 
-        if (worksheet[subLabelCell]) {
-          worksheet[subLabelCell].s = {
-            fill: { fgColor: { rgb: "F2F2F2" } },
-          };
-        }
-        if (worksheet[amountCell]) {
-          worksheet[amountCell].s = {
-            fill: { fgColor: { rgb: "F2F2F2" } },
-          };
-        }
+      // 🦓 Zebra striping
+      if (idx % 2 === 0) {
+        row.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "F2F2F2" },
+        };
       }
+
+      // ✍️ Apply grid borders to both cells
+      row.getCell(1).border = borderStyle;
+      row.getCell(2).border = borderStyle;
     });
 
-    rowIndex += cat.subcategories.length + 2;
+    sheet.addRow([]); // spacer
   });
 
-  const amountCol = "C";
-  let totalRows = rows.length;
-  for (let i = 3; i <= totalRows; i++) {
-    const cellRef = `${amountCol}${i}`;
-    if (worksheet[cellRef] && typeof worksheet[cellRef].v === "number") {
-      worksheet[cellRef].z = "$#,##0.00"; 
-  }
+  // Total Row
+  const totalRow = sheet.addRow(["Total Spent", totalSpent]);
+  totalRow.font = { bold: true };
+  totalRow.getCell(2).numFmt = '"$"#,##0.00';
 
-  const colWidths = [
-    { wch: 30 }, // A: Category
-    { wch: 25 }, // B: Subcategory
-    { wch: 15 }, // C: Amount
-  ];
-  worksheet["!cols"] = colWidths;
+  totalRow.getCell(1).border = borderStyle;
+  totalRow.getCell(2).border = borderStyle;
 
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Budget");
+  // Auto-width
+  sheet.columns.forEach((col) => {
+    if (!col) return;
+    let maxLength = 0;
+    col.eachCell?.({ includeEmpty: true }, (cell) => {
+      const len = cell.value?.toString().length ?? 10;
+      if (len > maxLength) maxLength = len;
+    });
+    col.width = maxLength + 4;
+  });
 
-  XLSX.writeFile(workbook, "budget-export.xlsx", { cellStyles: true });
-}};
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type:
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  saveAs(blob, "budget-export.xlsx");
+};

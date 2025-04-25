@@ -3,6 +3,7 @@ import { useState } from "react";
 import RightPane from "./components/right-pane";
 import LeftPane from "./components/left-pane";
 import ExcelIcon from "./assets/excel.png"; 
+import PdfIcon from "./assets/pdf-icon.png"
 import BudgetAppHeaderCard from "./components/BudgetAppHeaderCard";
 import { ModernSimpleInput } from "./components/ModernSimpleInput";
 import PreviewPillSwitchTheme from "./components/toggle-theme-icon";
@@ -10,8 +11,9 @@ import { BeforeEffectButton } from "./components/BeforeEffectButton";
 import { useCategories } from "./hooks/useCategories";
 import { useCurrency } from "./hooks/useCurrency";
 import { useTheme } from "./hooks/useTheme";
-import { exportCategoriesToExcel } from "./utils/exportToExcel";
+import { exportCategoriesToExcelWithStyle } from "./utils/exportToExcel";
 import { cn } from "./utils/cn";
+import { exportCategoriesToPDF } from "./utils/exportCategoriesToPdf";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -40,7 +42,11 @@ const App = () => {
   };
 
   const handleExportToExcel = () => {
-    exportCategoriesToExcel(categories);
+    exportCategoriesToExcelWithStyle(categories);
+  };
+
+  const handleExportToPDF = () => {
+    exportCategoriesToPDF(categories);
   };
 
   const formatCurrency = (value: string) => {
@@ -73,6 +79,20 @@ const App = () => {
           <PreviewPillSwitchTheme />
         </div>
       </div>
+
+{/* Export to PDF Button */}
+<div className="fixed bottom-[5rem] right-10 z-50">
+  <BeforeEffectButton
+    onClick={handleExportToPDF}
+    className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
+  >
+    <img
+      src={PdfIcon}
+      alt="Export to PDF"
+      className="w-8 h-8"
+    />
+  </BeforeEffectButton>
+</div>
 
       <div className="fixed bottom-5 right-10 z-50">
   <BeforeEffectButton
