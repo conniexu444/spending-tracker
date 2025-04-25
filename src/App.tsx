@@ -6,10 +6,11 @@ import LeftPane from "./components/left-pane";
 import BudgetAppHeaderCard from "./components/BudgetAppHeaderCard";
 import { ModernSimpleInput } from "./components/ModernSimpleInput";
 import PreviewPillSwitchTheme from "./components/toggle-theme-icon";
-
+import { BeforeEffectButton } from "./components/BeforeEffectButton";
 import { useCategories } from "./hooks/useCategories";
 import { useCurrency } from "./hooks/useCurrency";
 import { useTheme } from "./hooks/useTheme";
+import * as XLSX from "xlsx"; // ⬅️ Add to your imports
 
 import { cn } from "./utils/cn";
 
@@ -39,6 +40,25 @@ const App = () => {
     setNewCategoryName("");
   };
 
+  // inside your component
+  const handleExportToExcel = () => {
+    // Transform your categories into flat rows
+    const rows = categories.flatMap((cat) =>
+      cat.subcategories.map((sub) => ({
+        Category: cat.title,
+        Subcategory: sub.label,
+        Amount: sub.value,
+      })),
+    );
+
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Budget");
+
+    // Trigger download
+    XLSX.writeFile(workbook, "budget-export.xlsx");
+  };
+
   const formatCurrency = (value: string) => {
     if (value === "") return "";
     const cleaned = value.replace(/[^0-9.]/g, "");
@@ -56,7 +76,6 @@ const App = () => {
 
   const totalSpent = categoryTotals.reduce((a, b) => a + b, 0);
   const incomeAmount = parseCurrency(income);
-  const remaining = Math.max(0, incomeAmount - totalSpent);
 
   return (
     <div
@@ -71,10 +90,9 @@ const App = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-screen-2xl mx-auto flex flex-col gap-6">
+      <div className="w-full max-w-screen-2xl mx-auto flex flex-col gap-5">
         <BudgetAppHeaderCard />
-        <div className="flex flex-col lg:flex-row gap-10 w-full">
-          
+        <div className="flex flex-col lg:flex-row gap-5 w-full">
           <LeftPane
             income={income}
             setIncome={setIncome}
@@ -92,11 +110,17 @@ const App = () => {
           <RightPane
             format={format}
             totalSpent={totalSpent}
-            remaining={remaining}
             incomeAmount={incomeAmount}
             categories={categories}
             categoryTotals={categoryTotals}
           />
+          <BeforeEffectButton
+  onClick={handleExportToExcel}
+  className="fixed bottom-8 right-8 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+>
+  Export to Excel
+</BeforeEffectButton>
+
         </div>
       </div>
       {showAddCategoryModal && (

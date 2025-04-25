@@ -1,7 +1,5 @@
-// src/components/BeforeEffectButton.tsx
-
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { cn } from "../utils/cn"; // Adjust this path if needed
+import { cn } from "../utils/cn";
 
 type BeforeEffectButtonProps = {
   children: ReactNode;

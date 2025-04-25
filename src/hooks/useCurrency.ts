@@ -16,7 +16,10 @@ export function useCurrency(defaultCurrency = "USD") {
    * Format a number or string into a currency display string.
    */
   const format = (value: string | number): string => {
-    const num = typeof value === "string" ? parseFloat(value.replace(/[^0-9.]/g, "")) : value;
+    const num =
+      typeof value === "string"
+        ? parseFloat(value.replace(/[^0-9.]/g, ""))
+        : value;
 
     if (isNaN(num)) return "$0.00";
 

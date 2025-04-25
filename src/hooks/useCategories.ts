@@ -48,10 +48,9 @@ export function useCategories() {
       title: title.trim(),
       subcategories: [],
     };
-  
+
     setCategories((prev) => [...prev, newCategory]);
   };
-  
 
   return {
     categories,
