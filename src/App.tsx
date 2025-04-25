@@ -2,7 +2,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useState } from "react";
 import RightPane from "./components/right-pane";
 import LeftPane from "./components/left-pane";
-
+import ExcelIcon from "./assets/excel.png"; 
 import BudgetAppHeaderCard from "./components/BudgetAppHeaderCard";
 import { ModernSimpleInput } from "./components/ModernSimpleInput";
 import PreviewPillSwitchTheme from "./components/toggle-theme-icon";
@@ -90,6 +90,20 @@ const App = () => {
         </div>
       </div>
 
+      <div className="fixed bottom-10 right-10 z-50">
+  <BeforeEffectButton
+    onClick={handleExportToExcel}
+    className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
+  >
+    <img
+      src={ExcelIcon}
+      alt="Export to Excel"
+      className="w-8 h-8"
+    />
+  </BeforeEffectButton>
+</div>
+
+
       <div className="w-full max-w-screen-2xl mx-auto flex flex-col gap-5">
         <BudgetAppHeaderCard />
         <div className="flex flex-col lg:flex-row gap-5 w-full">
@@ -114,13 +128,6 @@ const App = () => {
             categories={categories}
             categoryTotals={categoryTotals}
           />
-          <BeforeEffectButton
-  onClick={handleExportToExcel}
-  className="fixed bottom-8 right-8 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
->
-  Export to Excel
-</BeforeEffectButton>
-
         </div>
       </div>
       {showAddCategoryModal && (
