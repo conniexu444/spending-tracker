@@ -10,8 +10,7 @@ import { BeforeEffectButton } from "./components/BeforeEffectButton";
 import { useCategories } from "./hooks/useCategories";
 import { useCurrency } from "./hooks/useCurrency";
 import { useTheme } from "./hooks/useTheme";
-import * as XLSX from "xlsx"; // ⬅️ Add to your imports
-
+import { exportCategoriesToExcel } from "./utils/exportToExcel";
 import { cn } from "./utils/cn";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -40,23 +39,8 @@ const App = () => {
     setNewCategoryName("");
   };
 
-  // inside your component
   const handleExportToExcel = () => {
-    // Transform your categories into flat rows
-    const rows = categories.flatMap((cat) =>
-      cat.subcategories.map((sub) => ({
-        Category: cat.title,
-        Subcategory: sub.label,
-        Amount: sub.value,
-      })),
-    );
-
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Budget");
-
-    // Trigger download
-    XLSX.writeFile(workbook, "budget-export.xlsx");
+    exportCategoriesToExcel(categories);
   };
 
   const formatCurrency = (value: string) => {
@@ -90,7 +74,7 @@ const App = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-10 right-10 z-50">
+      <div className="fixed bottom-5 right-10 z-50">
   <BeforeEffectButton
     onClick={handleExportToExcel}
     className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
