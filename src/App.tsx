@@ -2,8 +2,9 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useState } from "react";
 import RightPane from "./components/right-pane";
 import LeftPane from "./components/left-pane";
-import ExcelIcon from "./assets/excel.png"; 
-import PdfIcon from "./assets/pdf-icon.png"
+import ExcelIcon from "./assets/excel.png";
+import PdfIcon from "./assets/pdf-icon.png";
+import GithubIcon from "./assets/github-logo.png";
 import BudgetAppHeaderCard from "./components/BudgetAppHeaderCard";
 import { ModernSimpleInput } from "./components/ModernSimpleInput";
 import PreviewPillSwitchTheme from "./components/toggle-theme-icon";
@@ -52,8 +53,8 @@ const App = () => {
   const categoryTotals = categories.map((cat) =>
     cat.subcategories.reduce(
       (sum, sub) => sum + (parseFloat(sub.value) || 0),
-      0,
-    ),
+      0
+    )
   );
 
   const totalSpent = categoryTotals.reduce((a, b) => a + b, 0);
@@ -63,7 +64,7 @@ const App = () => {
     <div
       className={cn(
         "min-h-screen transition-colors w-full px-6 sm:px-10 lg:px-32 mt-10",
-        theme === "dark" ? "bg-zinc-900 text-white" : "bg-white text-gray-900",
+        theme === "dark" ? "bg-zinc-900 text-white" : "bg-white text-gray-900"
       )}
     >
       <div className="fixed top-4 right-14 z-50">
@@ -72,33 +73,35 @@ const App = () => {
         </div>
       </div>
 
-{/* Export to PDF Button */}
-<div className="fixed bottom-[5rem] right-10 z-50">
-  <BeforeEffectButton
-    onClick={handleExportToPDF}
-    className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
-  >
-    <img
-      src={PdfIcon}
-      alt="Export to PDF"
-      className="w-8 h-8"
-    />
-  </BeforeEffectButton>
-</div>
+      {/* Export to PDF Button */}
+      <div className="fixed bottom-[5rem] right-10 z-50">
+        <BeforeEffectButton
+          onClick={handleExportToPDF}
+          className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
+        >
+          <img src={PdfIcon} alt="Export to PDF" className="w-8 h-8" />
+        </BeforeEffectButton>
+      </div>
 
       <div className="fixed bottom-5 right-10 z-50">
-  <BeforeEffectButton
-    onClick={handleExportToExcel}
-    className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
-  >
-    <img
-      src={ExcelIcon}
-      alt="Export to Excel"
-      className="w-8 h-8"
-    />
-  </BeforeEffectButton>
-</div>
+        <BeforeEffectButton
+          onClick={handleExportToExcel}
+          className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
+        >
+          <img src={ExcelIcon} alt="Export to Excel" className="w-8 h-8" />
+        </BeforeEffectButton>
+      </div>
 
+      <div className="fixed bottom-5 left-10 z-50">
+        <BeforeEffectButton
+          onClick={() =>
+            window.open("https://github.com/conniexu444", "_blank")
+          }
+          className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
+        >
+          <img src={GithubIcon} alt="Github Link" className="w-8 h-8" />
+        </BeforeEffectButton>
+      </div>
 
       <div className="w-full max-w-screen-2xl mx-auto flex flex-col gap-5">
         <BudgetAppHeaderCard />
