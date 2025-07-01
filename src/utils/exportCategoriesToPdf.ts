@@ -1,5 +1,4 @@
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 export const exportCategoriesToPDF = (categories: any[]) => {
   const doc = new jsPDF("p", "pt", "a4"); // A4 size, points unit

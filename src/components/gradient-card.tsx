@@ -13,7 +13,6 @@ export const MainMenusGradientCard = ({
   className,
   children,
   onDeleteCategory,
-  size = "md",
 }: {
   title: string;
   description?: string;

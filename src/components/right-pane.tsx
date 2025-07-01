@@ -1,6 +1,5 @@
 "use client";
 
-import { useTheme } from "../hooks/useTheme";
 import { Category } from "../data/defaultCategories";
 import TotalSpentCard from "../components/TotalSpentCard";
 import TotalLeftCard from "../components/TotalLeftCard";
@@ -21,8 +20,6 @@ const RightPane: React.FC<RightPaneProps> = ({
   categories,
   categoryTotals,
 }) => {
-  const { theme } = useTheme();
-
   return (
     <div className="flex flex-col items-center gap-5 w-full lg:w-1/2">
       <div className="w-full flex flex-col sm:flex-row gap-4">

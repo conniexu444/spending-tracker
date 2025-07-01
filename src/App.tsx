@@ -49,14 +49,6 @@ const App = () => {
     exportCategoriesToPDF(categories);
   };
 
-  const formatCurrency = (value: string) => {
-    if (value === "") return "";
-    const cleaned = value.replace(/[^0-9.]/g, "");
-    const num = parseFloat(cleaned);
-    if (isNaN(num)) return value;
-    return num.toFixed(2);
-  };
-
   const categoryTotals = categories.map((cat) =>
     cat.subcategories.reduce(
       (sum, sub) => sum + (parseFloat(sub.value) || 0),

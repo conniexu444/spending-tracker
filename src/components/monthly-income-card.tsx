@@ -12,7 +12,6 @@ interface MonthlyIncomeCardProps {
 const MonthlyIncomeCard: React.FC<MonthlyIncomeCardProps> = ({
   income,
   setIncome,
-  format,
   parseCurrency,
 }) => {
   return (
