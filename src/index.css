@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,11 +12,10 @@
   }
 
   .no-spinner {
-    -moz-appearance: textfield; /* Firefox */
+    -moz-appearance: textfield;
   }
 }
 
-/* Optional: your custom global styles */
 body {
   @apply bg-white text-black dark:bg-zinc-900 dark:text-white;
 }

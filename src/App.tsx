@@ -73,25 +73,27 @@ const App = () => {
         </div>
       </div>
 
-      {/* Export to PDF Button */}
+      {/* PDF Button */}
       <div className="fixed bottom-[5rem] right-10 z-50">
         <BeforeEffectButton
           onClick={handleExportToPDF}
           className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
         >
-          <img src={PdfIcon} alt="Export to PDF" className="w-8 h-8" />
+          <img src={PdfIcon} alt="To PDF Button" className="w-8 h-8" />
         </BeforeEffectButton>
       </div>
 
+      {/* Excel Button */}
       <div className="fixed bottom-5 right-10 z-50">
         <BeforeEffectButton
           onClick={handleExportToExcel}
           className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
         >
-          <img src={ExcelIcon} alt="Export to Excel" className="w-8 h-8" />
+          <img src={ExcelIcon} alt="To Excel Button" className="w-8 h-8" />
         </BeforeEffectButton>
       </div>
 
+      {/* Github Button */}
       <div className="fixed bottom-5 left-10 z-50">
         <BeforeEffectButton
           onClick={() =>
@@ -99,7 +101,7 @@ const App = () => {
           }
           className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
         >
-          <img src={GithubIcon} alt="Github Link" className="w-8 h-8" />
+          <img src={GithubIcon} alt="To Github Button" className="w-8 h-8" />
         </BeforeEffectButton>
       </div>
 
