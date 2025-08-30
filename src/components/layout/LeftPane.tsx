@@ -10,19 +10,11 @@ interface LeftPaneProps {
   format: (val: string | number) => string;
   parseCurrency: (val: string) => number;
   categories: Category[];
-  handleSubcategoryChange: (
-    catIndex: number,
-    subIndex: number,
-    value: string,
-  ) => void;
-  handleSubcategoryLabelChange: (
-    catIndex: number,
-    subIndex: number,
-    label: string,
-  ) => void;
-  addSubcategory: (catIndex: number) => void;
-  deleteSubcategory: (catIndex: number, subIndex: number) => void;
-  deleteCategory: (catIndex: number) => void;
+  handleSubcategoryChange: (categoryId: string, subcategoryId: string, value: string) => void;
+  handleSubcategoryLabelChange: (categoryId: string, subcategoryId: string, label: string) => void;
+  addSubcategory: (categoryId: string) => void;
+  deleteSubcategory: (categoryId: string, subcategoryId: string) => void;
+  deleteCategory: (categoryId: string) => void;
   setShowAddCategoryModal: (open: boolean) => void;
 }
 
@@ -39,6 +31,45 @@ const LeftPane: React.FC<LeftPaneProps> = ({
   deleteCategory,
   setShowAddCategoryModal,
 }) => {
+  // Wrapper functions to convert from index-based calls to ID-based calls
+  const handleSubcategoryChangeWrapper = (catIndex: number, subIndex: number, value: string) => {
+    const category = categories[catIndex];
+    const subcategory = category?.subcategories[subIndex];
+    if (category && subcategory) {
+      handleSubcategoryChange(category.id, subcategory.id, value);
+    }
+  };
+
+  const handleSubcategoryLabelChangeWrapper = (catIndex: number, subIndex: number, label: string) => {
+    const category = categories[catIndex];
+    const subcategory = category?.subcategories[subIndex];
+    if (category && subcategory) {
+      handleSubcategoryLabelChange(category.id, subcategory.id, label);
+    }
+  };
+
+  const addSubcategoryWrapper = (catIndex: number) => {
+    const category = categories[catIndex];
+    if (category) {
+      addSubcategory(category.id);
+    }
+  };
+
+  const deleteSubcategoryWrapper = (catIndex: number, subIndex: number) => {
+    const category = categories[catIndex];
+    const subcategory = category?.subcategories[subIndex];
+    if (category && subcategory) {
+      deleteSubcategory(category.id, subcategory.id);
+    }
+  };
+
+  const deleteCategoryWrapper = (catIndex: number) => {
+    const category = categories[catIndex];
+    if (category) {
+      deleteCategory(category.id);
+    }
+  };
+
   return (
     <div className="w-full lg:w-1/2 flex flex-col gap-4">
       <MonthlyIncomeCard
@@ -50,14 +81,14 @@ const LeftPane: React.FC<LeftPaneProps> = ({
 
       {categories.map((cat, index) => (
         <CategoryCard
-          key={index}
+          key={cat.id}
           category={cat}
           index={index}
-          onSubcategoryChange={handleSubcategoryChange}
-          onLabelChange={handleSubcategoryLabelChange}
-          onAddSubcategory={addSubcategory}
-          onDeleteSubcategory={deleteSubcategory}
-          onDeleteCategory={deleteCategory}
+          onSubcategoryChange={handleSubcategoryChangeWrapper}
+          onLabelChange={handleSubcategoryLabelChangeWrapper}
+          onAddSubcategory={addSubcategoryWrapper}
+          onDeleteSubcategory={deleteSubcategoryWrapper}
+          onDeleteCategory={deleteCategoryWrapper}
         />
       ))}
 
