@@ -68,7 +68,7 @@ export const MainMenusGradientCard = ({
           </p>
         )}
       </div>
-      <div className="absolute inset-px rounded-[19px] bg-neutral-100/80 dark:bg-neutral-900/80" />
+      <div className="absolute inset-px rounded-[19px] bg-white/90 dark:bg-neutral-900/90" />
       {onDeleteCategory && (
         <BeforeEffectButton
           onClick={onDeleteCategory}

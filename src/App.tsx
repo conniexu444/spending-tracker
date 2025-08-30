@@ -1,169 +1,298 @@
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { useState } from "react";
-import RightPane from "./components/right-pane";
-import LeftPane from "./components/left-pane";
-import ExcelIcon from "./assets/excel.png";
-import PdfIcon from "./assets/pdf-icon.png";
-import GithubIcon from "./assets/github-logo.png";
-import BudgetAppHeaderCard from "./components/BudgetAppHeaderCard";
-import { ModernSimpleInput } from "./components/ModernSimpleInput";
-import PreviewPillSwitchTheme from "./components/toggle-theme-icon";
-import { BeforeEffectButton } from "./components/BeforeEffectButton";
-import { useCategories } from "./hooks/useCategories";
-import { useCurrency } from "./hooks/useCurrency";
-import { useTheme } from "./hooks/useTheme";
-import { exportCategoriesToExcelWithStyle } from "./utils/exportToExcel";
-import { cn } from "./utils/cn";
-import { exportCategoriesToPDF } from "./utils/exportCategoriesToPdf";
+import React, { useState, useCallback, useMemo } from 'react';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+
+// Context and Hooks
+import { BudgetProvider, useBudget } from './contexts/BudgetContext';
+import { useTheme } from './hooks/useTheme';
+import { useCurrency } from './hooks/useCurrency';
+
+// Components
+import { ErrorBoundary, Modal, Button, Input } from './components/ui';
+import BudgetAppHeaderCard from './components/layout/BudgetAppHeaderCard';
+import LeftPane from './components/layout/LeftPane';
+import RightPane from './components/layout/RightPane';
+import PreviewPillSwitchTheme from './components/ui/ThemeToggle';
+import { BeforeEffectButton } from './components/ui/BeforeEffectButton';
+
+// Utils and Constants
+import { exportCategoriesToExcelWithStyle } from './utils/exportToExcel';
+import { exportCategoriesToPDF } from './utils/exportCategoriesToPdf';
+import { cn } from './utils/cn';
+import { APP_CONFIG, UI_CONFIG, VALIDATION } from './constants/app';
+
+// Assets
+import ExcelIcon from './assets/excel.png';
+import PdfIcon from './assets/pdf-icon.png';
+import GithubIcon from './assets/github-logo.png';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const App = () => {
-  const { theme, toggleTheme } = useTheme();
-  const [income, setIncome] = useState<string>("");
-  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const { format, parseCurrency } = useCurrency();
+// Separate component for the floating action buttons
+const FloatingActions: React.FC<{
+  onExportExcel: () => void;
+  onExportPDF: () => void;
+  onToggleTheme: () => void;
+}> = React.memo(({ onExportExcel, onExportPDF, onToggleTheme }) => (
+  <>
+    {/* Theme Toggle */}
+    <div className="fixed top-4 right-14 z-50">
+      <div onClick={onToggleTheme} className="cursor-pointer">
+        <PreviewPillSwitchTheme />
+      </div>
+    </div>
 
-  const {
-    categories,
-    addCategory,
-    handleSubcategoryChange,
-    handleSubcategoryLabelChange,
-    addSubcategory,
-    deleteSubcategory,
-    deleteCategory,
-  } = useCategories();
+    {/* PDF Export Button */}
+    <div className="fixed bottom-[5rem] right-10 z-50">
+      <BeforeEffectButton
+        onClick={onExportPDF}
+        className={cn(
+          'p-3 rounded-full',
+          UI_CONFIG.animations.transition,
+          UI_CONFIG.animations.hover
+        )}
+        aria-label="Export to PDF"
+      >
+        <img src={PdfIcon} alt="Export to PDF" className="w-8 h-8" />
+      </BeforeEffectButton>
+    </div>
 
-  const handleAddCategory = () => {
-    if (!newCategoryName.trim()) return;
-    addCategory(newCategoryName);
-    setShowAddCategoryModal(false);
-    setNewCategoryName("");
-  };
+    {/* Excel Export Button */}
+    <div className="fixed bottom-5 right-10 z-50">
+      <BeforeEffectButton
+        onClick={onExportExcel}
+        className={cn(
+          'p-3 rounded-full',
+          UI_CONFIG.animations.transition,
+          UI_CONFIG.animations.hover
+        )}
+        aria-label="Export to Excel"
+      >
+        <img src={ExcelIcon} alt="Export to Excel" className="w-8 h-8" />
+      </BeforeEffectButton>
+    </div>
 
-  const handleExportToExcel = () => {
-    exportCategoriesToExcelWithStyle(categories);
-  };
+    {/* GitHub Link */}
+    <div className="fixed bottom-5 left-10 z-50">
+      <BeforeEffectButton
+        onClick={() => window.open(APP_CONFIG.github.url, '_blank')}
+        className={cn(
+          'p-3 rounded-full',
+          UI_CONFIG.animations.transition,
+          UI_CONFIG.animations.hover
+        )}
+        aria-label={APP_CONFIG.github.label}
+      >
+        <img src={GithubIcon} alt="GitHub" className="w-8 h-8" />
+      </BeforeEffectButton>
+    </div>
+  </>
+));
 
-  const handleExportToPDF = () => {
-    exportCategoriesToPDF(categories);
-  };
+// Modal component for adding new categories
+const AddCategoryModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  onAdd: (name: string) => void;
+}> = React.memo(({ isOpen, onClose, onAdd }) => {
+  const [categoryName, setCategoryName] = useState('');
+  const [error, setError] = useState('');
 
-  const categoryTotals = categories.map((cat) =>
-    cat.subcategories.reduce(
-      (sum, sub) => sum + (parseFloat(sub.value) || 0),
-      0
-    )
+  const handleSubmit = useCallback(() => {
+    const trimmedName = categoryName.trim();
+    
+    if (!trimmedName) {
+      setError('Category name is required');
+      return;
+    }
+    
+    if (trimmedName.length < VALIDATION.category.minLength) {
+      setError(`Category name must be at least ${VALIDATION.category.minLength} character(s)`);
+      return;
+    }
+    
+    if (trimmedName.length > VALIDATION.category.maxLength) {
+      setError(`Category name must be less than ${VALIDATION.category.maxLength} characters`);
+      return;
+    }
+
+    onAdd(trimmedName);
+    setCategoryName('');
+    setError('');
+    onClose();
+  }, [categoryName, onAdd, onClose]);
+
+  const handleClose = useCallback(() => {
+    setCategoryName('');
+    setError('');
+    onClose();
+  }, [onClose]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
+    }
+  }, [handleSubmit]);
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Add New Category"
+      size="medium"
+    >
+      <div className="space-y-4">
+        <div>
+          <label 
+            htmlFor="category-name"
+            className="text-sm font-medium block mb-1 dark:text-neutral-300"
+          >
+            Category Name
+          </label>
+          <Input
+            id="category-name"
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="e.g. Entertainment"
+            aria-label="Category name"
+            required
+          />
+          {error && (
+            <p className="text-red-500 text-sm mt-1" role="alert">
+              {error}
+            </p>
+          )}
+        </div>
+        
+        <div className="flex justify-end gap-2 pt-2">
+          <Button
+            variant="secondary"
+            onClick={handleClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleSubmit}
+            disabled={!categoryName.trim()}
+          >
+            Add Category
+          </Button>
+        </div>
+      </div>
+    </Modal>
   );
+});
 
-  const totalSpent = categoryTotals.reduce((a, b) => a + b, 0);
-  const incomeAmount = parseCurrency(income);
+// Main App Content component (separated for cleaner code)
+const AppContent: React.FC = () => {
+  const { theme, toggleTheme } = useTheme();
+  const { format, parseCurrency } = useCurrency();
+  const { state, actions, computed, setIncome } = useBudget();
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
+
+  // Memoized handlers to prevent unnecessary re-renders
+  const handleExportToExcel = useCallback(() => {
+    exportCategoriesToExcelWithStyle(state.categories);
+  }, [state.categories]);
+
+  const handleExportToPDF = useCallback(() => {
+    exportCategoriesToPDF(state.categories);
+  }, [state.categories]);
+
+  const handleAddCategory = useCallback((title: string) => {
+    actions.addCategory(title);
+  }, [actions]);
+
+  const handleOpenAddModal = useCallback(() => {
+    setShowAddCategoryModal(true);
+  }, []);
+
+  const handleCloseAddModal = useCallback(() => {
+    setShowAddCategoryModal(false);
+  }, []);
+
+  // Memoized computed values
+  const incomeAmount = useMemo(() => parseCurrency(state.income), [state.income, parseCurrency]);
 
   return (
     <div
       className={cn(
-        "min-h-screen transition-colors w-full px-6 sm:px-10 lg:px-32 mt-10",
-        theme === "dark" ? "bg-zinc-900 text-white" : "bg-white text-gray-900"
+        'min-h-screen transition-colors w-full px-6 sm:px-10 lg:px-32 mt-10',
+        theme === 'dark' ? 'bg-zinc-900 text-white' : 'bg-white text-gray-900'
       )}
     >
-      <div className="fixed top-4 right-14 z-50">
-        <div onClick={toggleTheme} className="cursor-pointer">
-          <PreviewPillSwitchTheme />
-        </div>
-      </div>
-
-      {/* PDF Button */}
-      <div className="fixed bottom-[5rem] right-10 z-50">
-        <BeforeEffectButton
-          onClick={handleExportToPDF}
-          className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
-        >
-          <img src={PdfIcon} alt="To PDF Button" className="w-8 h-8" />
-        </BeforeEffectButton>
-      </div>
-
-      {/* Excel Button */}
-      <div className="fixed bottom-5 right-10 z-50">
-        <BeforeEffectButton
-          onClick={handleExportToExcel}
-          className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
-        >
-          <img src={ExcelIcon} alt="To Excel Button" className="w-8 h-8" />
-        </BeforeEffectButton>
-      </div>
-
-      {/* Github Button */}
-      <div className="fixed bottom-5 left-10 z-50">
-        <BeforeEffectButton
-          onClick={() =>
-            window.open("https://github.com/conniexu444", "_blank")
-          }
-          className="p-3 rounded-full transition transform hover:-translate-y-1 hover:scale-105"
-        >
-          <img src={GithubIcon} alt="To Github Button" className="w-8 h-8" />
-        </BeforeEffectButton>
-      </div>
+      <FloatingActions
+        onExportExcel={handleExportToExcel}
+        onExportPDF={handleExportToPDF}
+        onToggleTheme={toggleTheme}
+      />
 
       <div className="w-full max-w-screen-2xl mx-auto flex flex-col gap-5">
         <BudgetAppHeaderCard />
+        
         <div className="flex flex-col lg:flex-row gap-5 w-full">
           <LeftPane
-            income={income}
+            income={state.income}
             setIncome={setIncome}
             format={format}
             parseCurrency={parseCurrency}
-            categories={categories}
-            handleSubcategoryChange={handleSubcategoryChange}
-            handleSubcategoryLabelChange={handleSubcategoryLabelChange}
-            addSubcategory={addSubcategory}
-            deleteSubcategory={deleteSubcategory}
-            deleteCategory={deleteCategory}
-            setShowAddCategoryModal={setShowAddCategoryModal}
+            categories={state.categories}
+            handleSubcategoryChange={actions.updateSubcategoryValue}
+            handleSubcategoryLabelChange={actions.updateSubcategoryLabel}
+            addSubcategory={actions.addSubcategory}
+            deleteSubcategory={actions.deleteSubcategory}
+            deleteCategory={actions.deleteCategory}
+            setShowAddCategoryModal={handleOpenAddModal}
           />
 
           <RightPane
             format={format}
-            totalSpent={totalSpent}
+            totalSpent={computed.budgetSummary.totalSpent}
             incomeAmount={incomeAmount}
-            categories={categories}
-            categoryTotals={categoryTotals}
+            categories={state.categories}
+            categoryTotals={computed.categoryTotals}
           />
         </div>
       </div>
-      {showAddCategoryModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-lg w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4 dark:text-white">
-              New Category
-            </h3>
 
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium block mb-1 dark:text-neutral-300">
-                  Category Name
-                </label>
-                <ModernSimpleInput
-                  type="text"
-                  value={newCategoryName}
-                  onChange={(e) => setNewCategoryName(e.target.value)}
-                  placeholder="e.g. Entertainment"
-                />
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  onClick={() => setShowAddCategoryModal(false)}
-                  className="text-sm px-4 py-2 rounded-md border dark:border-neutral-600 dark:text-neutral-300"
-                >
-                  Cancel
-                </button>
-                <button onClick={handleAddCategory}>Add</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddCategoryModal
+        isOpen={showAddCategoryModal}
+        onClose={handleCloseAddModal}
+        onAdd={handleAddCategory}
+      />
     </div>
+  );
+};
+
+// Error fallback component
+const AppErrorFallback: React.FC<{ error: Error; resetError: () => void }> = ({ 
+  error, 
+  resetError 
+}) => (
+  <div className="flex items-center justify-center min-h-screen bg-red-50 dark:bg-red-900/20">
+    <div className="text-center p-6 max-w-md">
+      <h1 className="text-2xl font-bold text-red-600 mb-4">
+        Budget App Error
+      </h1>
+      <p className="text-gray-600 dark:text-gray-300 mb-4">
+        Something went wrong with the budget application: {error.message}
+      </p>
+      <Button onClick={resetError}>
+        Restart Application
+      </Button>
+    </div>
+  </div>
+);
+
+// Main App component with all providers
+const App: React.FC = () => {
+  return (
+    <ErrorBoundary fallback={AppErrorFallback}>
+      <BudgetProvider>
+        <AppContent />
+      </BudgetProvider>
+    </ErrorBoundary>
   );
 };
 
