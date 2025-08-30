@@ -23,7 +23,7 @@ export const MainMenusCompactCard = ({
     <div
       ref={parentRef}
       className={cn(
-        "group relative transform-gpu overflow-hidden rounded-[20px] bg-white/10 dark:bg-black/10 p-3 transition-transform hover:scale-[1.01]",
+        "group relative transform-gpu overflow-hidden rounded-[20px] bg-white/10 p-3 transition-transform hover:scale-[1.01]",
         className,
       )}
     >
@@ -46,7 +46,7 @@ export const MainMenusCompactCard = ({
         }}
       />
       {/* Background layer */}
-      <div className="absolute inset-px rounded-[19px] bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm" />
+      <div className="absolute inset-px rounded-[19px] bg-neutral-100/80 dark:bg-neutral-900/80" />
 
       {/* Header */}
       <div className="relative z-10">{header}</div>

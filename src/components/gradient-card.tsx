@@ -27,7 +27,7 @@ export const MainMenusGradientCard = ({
 
   return (
     <div
-      className="group relative transform-gpu overflow-hidden rounded-[20px] bg-white/10 dark:bg-black/10 p-2 transition-transform hover:scale-[1.01]"
+      className="group relative transform-gpu overflow-hidden rounded-[20px] bg-white/10 p-2 transition-transform hover:scale-[1.01]"
       ref={parentRef}
     >
       {withArrow && (
@@ -68,7 +68,7 @@ export const MainMenusGradientCard = ({
           </p>
         )}
       </div>
-      <div className="absolute inset-px rounded-[19px] bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm" />
+      <div className="absolute inset-px rounded-[19px] bg-neutral-100/80 dark:bg-neutral-900/80" />
       {onDeleteCategory && (
         <BeforeEffectButton
           onClick={onDeleteCategory}
@@ -80,7 +80,7 @@ export const MainMenusGradientCard = ({
       {children && (
         <div
           className={cn(
-            "relative p-4 rounded-[15px] border-white dark:border-neutral-950 bg-transparent",
+            "relative p-4 rounded-[15px] border-white dark:border-neutral-950 dark:bg-transparent",
             className,
           )}
         >
