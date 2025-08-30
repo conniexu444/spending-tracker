@@ -97,7 +97,8 @@ const SankeyChart = ({ data }: SankeyChartProps) => {
             return chroma(baseColor).brighten(1.5).hex();
           },
 
-          nodePadding: 60,
+          nodePadding: 120,
+          nodeWidth: 20,
         },
       ],
     };
@@ -107,7 +108,7 @@ const SankeyChart = ({ data }: SankeyChartProps) => {
       plugins: {
         legend: { display: false },
       },
-      layout: { padding: 10 },
+      layout: { padding: 20 },
       color: theme === "dark" ? "#777777" : "#777777",
     };
 
