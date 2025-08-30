@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
+    "@types/uuid": "^10.0.0",
     "@uidotdev/usehooks": "^2.4.1",
     "chart.js": "^4.4.9",
     "chartjs-chart-sankey": "^0.14.0",
@@ -25,6 +26,7 @@
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.488.0",
     "next-themes": "^0.4.6",
+    "playwright": "^1.55.0",
     "react": "^19.1.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
